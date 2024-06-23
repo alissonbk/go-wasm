@@ -9,11 +9,12 @@ import (
 )
 
 var (
-	ctx          js.Value
-	circleRadius       = 20
-	offset             = float64(circleRadius * 2)
-	colorList          = [...]string{"asd", "qwe", "asdasd", "qweqwe", "asdasd"}
-	FPS          int64 = 10
+	ctx                 js.Value
+	circleRadius              = 20
+	offset                    = 40
+	colorList                 = [...]string{"red", "green", "blue", "cyan", "pink"}
+	circleAmountAtFrame       = 20
+	FPS                 int64 = 60
 )
 
 type Pos struct {
@@ -31,27 +32,30 @@ func handleWindowResize(doc js.Value, canvasEl js.Value, bodySize Pos) {
 	}
 }
 
-func getRandomColor() {
-
+func getRandomColor() string {
+	randomPos := rand.Intn(len(colorList) - 1)
+	return colorList[randomPos]
 }
 
 func getRandomPosition(maxPos Pos) Pos {
-	maxX := (maxPos.x - offset) - 20
-	maxY := (maxPos.y - offset) - 20
+	maxX := int(maxPos.x) - (offset * 2)
+	maxY := int(maxPos.y) - (offset * 2)
 	return Pos{
-		x: rand.Float64()*(maxX+offset) + offset,
-		y: rand.Float64()*(maxY+offset) + offset,
+		x: float64(rand.Intn(maxX) + offset),
+		y: float64(rand.Intn(maxY) + offset),
 	}
 }
 
 func draw(doc js.Value, canvasEl js.Value, bodySize Pos) {
 	handleWindowResize(doc, canvasEl, bodySize)
-	randomPos := getRandomPosition(bodySize)
 
-	ctx.Call("beginPath")
-	ctx.Call("arc", randomPos.x, randomPos.y, circleRadius, 0, 2*math.Pi)
-	ctx.Call("fill")
-	ctx.Call("restore")
+	for i := 0; i < circleAmountAtFrame; i++ {
+		randomPos := getRandomPosition(bodySize)
+		ctx.Call("beginPath")
+		ctx.Call("arc", randomPos.x, randomPos.y, circleRadius, 0, 2*math.Pi)
+		ctx.Set("fillStyle", getRandomColor())
+		ctx.Call("fill")
+	}
 }
 
 //https://codepen.io/chriscourses/pen/Vwamprd
@@ -67,8 +71,6 @@ func main() {
 	}
 	canvasEl.Set("width", bodySize.x)
 	canvasEl.Set("height", bodySize.y)
-
-	doc.Get("body").Get("style").Set("backgroundColor", "red")
 
 	ctx = canvasEl.Call("getContext", "2d")
 
