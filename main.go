@@ -13,8 +13,8 @@ var (
 	circleRadius              = 20
 	offset                    = 40
 	colorList                 = [...]string{"red", "green", "blue", "cyan", "pink"}
-	circleAmountAtFrame       = 20
-	FPS                 int64 = 60
+	circleAmountAtFrame       = 200
+	FPS                 int64 = 144
 )
 
 type Pos struct {
